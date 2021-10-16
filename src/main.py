@@ -1,8 +1,6 @@
 import traceback
 import time
 import numpy as np
-import pyvirtualcam as pvc
-from pyvirtualcam import PixelFormat
 import cv2 as cv
 import utils
 from utils import state
@@ -47,6 +45,8 @@ def without_cam():
 
 def with_cam():
 
+    import pyvirtualcam as pvc
+    from pyvirtualcam import PixelFormat
     try:
         utils.log_start('Performing program setup...')
         cam = utils.open_camera(0)
