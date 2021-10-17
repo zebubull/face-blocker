@@ -14,6 +14,13 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+def printerr(error: str) -> None:
+    '''
+    Prints a log message indicating that an error occured
+    '''
+    print(f'{bcolors.FAIL}[ERROR] {error}{bcolors.ENDC}')
+    return
+
 class ProgramState:
     def __init__(self):
         self.camera: cv.VideoCapture = None
@@ -45,16 +52,24 @@ class ProgramState:
                     printerr(f'Could not find image at {self.argv[i+1]}. Using default rectangle.')
                 else:
                     try:
+                        import numpy as np
                         self.block_image = cv.imread(self.argv[i+1])
                         self.imwidth = self.block_image.shape[0]
                         self.imheight = self.block_image.shape[1]
                         self.block_image = np.array(self.block_image)
                         self.block_alpha_mask = self.block_image[:, :, 2] / 255.0
                         self.use_image = True
+                    except ModuleNotFoundError:
+                        printerr(f'Please install numpy to use this option. Using default rectangle.')
                     except:
-                        printerr(f'Error reading image at {self.argv[i+1]} using default rectangle.')
+                        printerr(f'Error reading image at {self.argv[i+1]}. Using default rectangle.')
             elif val =='-c' or val == '--camera':
-                self.use_cam = True
+                try:
+                    import numpy as np
+                    import pyvirtualcam
+                    self.use_cam = True
+                except ModuleNotFoundError:
+                    printerr(f'Please install numpy and pyvirtualcam to use this option.')
             elif val == '-h' or val == '--help':
                 self.print_help()
                 exit(0)
@@ -72,14 +87,6 @@ Face Blocker v2.0 by pixelatedCorn
 
 
 state = ProgramState()
-
-
-def printerr(error: str) -> None:
-    '''
-    Prints a log message indicating that an error occured
-    '''
-    print(f'{bcolors.FAIL}[ERROR] {error}{bcolors.ENDC}')
-    return
 
 def fatalerr(error: str, exit_code: int)-> None:
     '''
@@ -205,7 +212,7 @@ def block_face(frame, coords):
         try:
             frame = overlay_transparent(frame, state.block_image, dx, dy)
         except ValueError:
-            pass
+            printerr('Overlay image out of bounds')
     else:
         cv.rectangle(frame, (x, y), (x+w, y+h), (0,255,0), -1)
 
