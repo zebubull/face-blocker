@@ -16,5 +16,5 @@ py -3 src/main.py [options]
 
 ## Deps
 - opencv2
-- numpy (Only required if you want to use the -i flag)
+- numpy (Only required if you want to use the -i and -c flags)
 - pyvirtualcam  (Only required if you want to use the -c flag)
